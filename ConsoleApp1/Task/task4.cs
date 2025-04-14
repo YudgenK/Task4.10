@@ -12,93 +12,88 @@ namespace ConsoleApp1.Task
     {
         public void Run()
         {
-            ArrayList<int> intList = new ArrayList<int>();
+            // Створення екземпляра MyList
+            MyList myList = new MyList(5);
 
-            intList.Add(10);
-            intList.Add(5);
-            intList.Add(15);
+            // Додавання елементів у список
+            myList.Add("Apple");
+            myList.Add("Banana");
+            myList.Add("Cherry");
+            myList.Add("Date");
+            myList.Add("Elderberry");
 
-            Console.WriteLine("Вміст ArrayList для типу int:");
-            intList.Display();
+            // Отримання масиву через метод розширення
+            var array = myList.GetArray<string>();
 
-            ArrayList<string> stringList = new ArrayList<string>();
-
-            stringList.Add("apple");
-            stringList.Add("banana");
-            stringList.Add("cherry");
-
-            Console.WriteLine("\nВміст ArrayList для типу string:");
-            stringList.Display();
-
-            Console.WriteLine("\nКількість елементів у ArrayList для int:");
-            Console.WriteLine(intList.Count);
-
-            Console.WriteLine("\nКількість елементів у ArrayList для string:");
-            Console.WriteLine(stringList.Count);
-
-            try
+            // Виведення елементів масиву
+            Console.WriteLine("Елементи масиву:");
+            foreach (var item in array)
             {
-                Console.WriteLine("\nОтримання елемента на індексі 5 для int:");
-                Console.WriteLine(intList[5]);
+                Console.WriteLine(item);
             }
-            catch (IndexOutOfRangeException ex)
-            {
-                Console.WriteLine(ex.Message); 
-            }
+
+
         }
     }
-    public class ArrayList<T> where T : IComparable<T> 
+    // Клас MyList для зберігання елементів
+    public class MyList
     {
-        private T[] _items;
-        private int _size;
+        private string[] items;
+        private int count;
 
-        public ArrayList()
+        public MyList(int capacity)
         {
-            _items = new T[4]; 
-            _size = 0;
+            items = new string[capacity];
+            count = 0;
         }
 
-        public int Count
+        // Метод для додавання елементів у список
+        public void Add(string item)
         {
-            get { return _size; }
-        }
-
-        public void Add(T item)
-        {
-            if (_size == _items.Length)
+            if (count < items.Length)
             {
-                Resize(_items.Length * 2); 
+                items[count++] = item;
             }
-
-            _items[_size++] = item; 
+            else
+            {
+                Console.WriteLine("Список заповнений!");
+            }
         }
 
-        
-        public T this[int index]
+        // Індексатор для отримання елементів за індексом
+        public string this[int index]
         {
             get
             {
-                if (index >= 0 && index < _size)
-                    return _items[index];
+                if (index >= 0 && index < count)
+                {
+                    return items[index];
+                }
                 else
-                    throw new IndexOutOfRangeException("Індекс знаходиться за межами масиву.");
+                {
+                    return "Індекс поза межами списку.";
+                }
             }
         }
 
-       
-        private void Resize(int newSize)
+        // Властивість для отримання кількості елементів
+        public int Count => count;
+    }
+
+    // Статичний клас з методами розширення
+    public static class MyListExtensions
+    {
+        // Метод розширення для перетворення списку в масив
+        public static T[] GetArray<T>(this MyList list)
         {
-            T[] newItems = new T[newSize];
-            Array.Copy(_items, newItems, _size);
-            _items = newItems;
-        }
-        public void Display()
-        {
-            for (int i = 0; i < _size; i++)
+            T[] array = new T[list.Count];
+            for (int i = 0; i < list.Count; i++)
             {
-                Console.WriteLine(_items[i]);
+                array[i] = (T)Convert.ChangeType(list[i], typeof(T));
             }
+            return array;
         }
     }
+
 
 }

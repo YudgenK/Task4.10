@@ -12,70 +12,91 @@ namespace ConsoleApp1.Task
     {
         public void Run()
         {
-            var myDictionary = new Dictionary<string, int>();
+            // Створюємо істот
+            Human human = new Human();
+            Elf elf = new Elf();
+            Robot robot = new Robot();
 
-            myDictionary.Add("Apple", 10);
-            myDictionary.Add("Banana", 20);
-            myDictionary.Add("Cherry", 30);
+            // Створюємо чарівні мішки для кожної істоти
+            MagicBag<Human> humanBag = new MagicBag<Human>(human);
+            MagicBag<Elf> elfBag = new MagicBag<Elf>(elf);
+            MagicBag<Robot> robotBag = new MagicBag<Robot>(robot);
 
-            Console.WriteLine("Вміст словника:");
-            myDictionary.Display();
+            // Істоти відкривають мішки
+            humanBag.OpenBag();  // Людина отримує подарунок
+            elfBag.OpenBag();    // Ельф отримує подарунок
+            robotBag.OpenBag();  // Робот отримує подарунок
 
-            Console.WriteLine("\nЗначення за ключем 'Banana':");
-            Console.WriteLine(myDictionary["Banana"]);
-
-            Console.WriteLine("\nКількість елементів у словнику:");
-            Console.WriteLine(myDictionary.Count);
-
-            try
-            {
-                Console.WriteLine("\nСпроба отримати значення за неіснуючим ключем:");
-                Console.WriteLine(myDictionary["Orange"]);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
+            // Спробуємо знову відкрити мішок для людини
+            Console.WriteLine();
+            humanBag.OpenBag();  // Людина вже відкривав мішок сьогодні
         }
-        public class Dictionary<TKey, TValue>
+
+        // Інтерфейс для істот
+        public interface ICreature
         {
-            private List<KeyValuePair<TKey, TValue>> _items;
+            string Type { get; }
+        }
 
-            public Dictionary()
+        // Клас для створення подарунків
+        public class Gift
+        {
+            public string Name { get; set; }
+
+            public Gift(string name)
             {
-                _items = new List<KeyValuePair<TKey, TValue>>();
+                Name = name;
+            }
+        }
+
+        // Чарівний мішок
+        public class MagicBag<T> where T : ICreature
+        {
+            private Gift _gift;
+            private DateTime _lastOpened;
+            private T _creature;
+
+            public MagicBag(T creature)
+            {
+                _creature = creature;
+                _lastOpened = DateTime.MinValue;  // Ініціалізація часу останнього відкриття
             }
 
-            public int Count => _items.Count;
-
-            public void Add(TKey key, TValue value)
+            // Метод для відкриття мішка
+            public Gift OpenBag()
             {
-                _items.Add(new KeyValuePair<TKey, TValue>(key, value));
-            }
-
-            public TValue this[TKey key]
-            {
-                get
+                // Перевірка, чи вже істота відкривала мішок сьогодні
+                if (_lastOpened.Date == DateTime.Today)
                 {
-                    foreach (var pair in _items)
-                    {
-                        if (EqualityComparer<TKey>.Default.Equals(pair.Key, key))
-                        {
-                            return pair.Value;
-                        }
-                    }
+                    Console.WriteLine($"{_creature.Type} вже відкривав мішок сьогодні!");
+                    return null;
+                }
 
-                    throw new KeyNotFoundException("Ключ не знайдений.");
-                }
+                // Створюємо подарунок для цієї істоти
+                _gift = new Gift($"Подарунок для {_creature.Type}");
+                _lastOpened = DateTime.Now;  // Оновлюємо час останнього відкриття
+
+                Console.WriteLine($"{_creature.Type} отримав подарунок: {_gift.Name}");
+                return _gift;
             }
-            public void Display()
-            {
-                foreach (var pair in _items)
-                {
-                    Console.WriteLine($"Ключ: {pair.Key}, Значення: {pair.Value}");
-                }
-            }
+        }
+
+        // Клас для людини
+        public class Human : ICreature
+        {
+            public string Type => "Людина";
+        }
+
+        // Клас для ельфа
+        public class Elf : ICreature
+        {
+            public string Type => "Ельф";
+        }
+
+        // Клас для робота
+        public class Robot : ICreature
+        {
+            public string Type => "Робот";
         }
 
     }

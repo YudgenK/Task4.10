@@ -32,16 +32,6 @@ namespace ConsoleApp1
                         task4();
                         break;
                     }
-                case 6:
-                    {
-                        task6();
-                        break;
-                    }
-                case 7:
-                    {
-                        task7();
-                        break;
-                    }
                 default:
                     {
                         Console.WriteLine("Такого завдання немає");
@@ -66,16 +56,6 @@ namespace ConsoleApp1
             var Task4 = new task4();
             Task4.Run();
         }
-        private static void task6()
-        {
-            var Task6 = new ConsoleApp1.Task.task6();
-            Task6.Run();
-        }
-        private static void task7()
-        {
-            var Task7 = new task7();
-            Task7.Run();
-        }
-
+       
     }
 }
