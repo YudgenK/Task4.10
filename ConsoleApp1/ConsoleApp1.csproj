@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Task\task7.cs" />
+    <None Include="Task\task6.cs" />
     <None Include="Task\task4.cs" />
   </ItemGroup>
 

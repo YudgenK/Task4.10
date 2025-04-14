@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,89 +12,81 @@ namespace ConsoleApp1.Task
 
         public void Run()
         {
-            // Створюємо екземпляр MyList для зберігання цілих чисел
-            MyList<int> myList = new MyList<int>();
+            CarCollection<Car> carCollection = new CarCollection<Car>();
 
-            // Додаємо елементи в список
-            myList.Add(10);
-            myList.Add(20);
-            myList.Add(30);
+            carCollection.AddCar("Toyota Camry", 2020);
+            carCollection.AddCar("Honda Accord", 2018);
+            carCollection.AddCar("BMW 3 Series", 2022);
 
-            Console.WriteLine($"Кількість елементів: {myList.Count}");
+            Console.WriteLine($"Кількість автомобілів у колекції: {carCollection.Count}");
 
-            for (int i = 0; i < myList.Count; i++)
+            Console.WriteLine("Автомобілі в колекції:");
+            for (int i = 0; i < carCollection.Count; i++)
             {
-                Console.WriteLine($"Елемент {i + 1}: {myList[i]}");
+                Console.WriteLine(carCollection[i]);
             }
 
-            // Використовуємо індексатор для зміни значення елемента
-            myList[1] = 50;
+            carCollection.RemoveAllCars();
+            Console.WriteLine("\nПісля видалення всіх автомобілів:");
+            Console.WriteLine($"Кількість автомобілів у колекції: {carCollection.Count}");
 
-            Console.WriteLine("\nОновлений список:");
-            for (int i = 0; i < myList.Count; i++)
-            {
-                Console.WriteLine($"Елемент {i + 1}: {myList[i]}");
-            }
         }
 
     }
-    class MyList<T>
+    public class Car
     {
-        private T[] elements;
-        private int count;
+        public string Name { get; set; }
+        public int Year { get; set; }
 
-        public MyList()
+        public Car(string name, int year)
         {
-            elements = new T[4];  // Початковий розмір масиву
-            count = 0;
+            Name = name;
+            Year = year;
         }
 
-        // Властивість для отримання кількості елементів
-        public int Count
+        public override string ToString()
         {
-            get { return count; }
+            return $"{Name} ({Year})";
+        }
+    }
+
+    public class CarCollection<T> where T : Car 
+    {
+        private List<T> cars;
+
+        public CarCollection()
+        {
+            cars = new List<T>();
         }
 
-        // Індексатор для доступу до елементів за індексом
+        public int Count => cars.Count;
+
+        public void AddCar(string name, int year)
+        {
+            T car = (T)Activator.CreateInstance(typeof(T), name, year);
+            cars.Add(car);
+        }
+
         public T this[int index]
         {
             get
             {
-                if (index < 0 || index >= count)
+                if (index >= 0 && index < cars.Count)
                 {
-                    throw new IndexOutOfRangeException("Індекс знаходиться поза межами списку.");
+                    return cars[index];
                 }
-                return elements[index];
-            }
-            set
-            {
-                if (index < 0 || index >= count)
+                else
                 {
-                    throw new IndexOutOfRangeException("Індекс знаходиться поза межами списку.");
+                    throw new IndexOutOfRangeException("Індекс поза межами колекції.");
                 }
-                elements[index] = value;
             }
         }
-
-        // Метод для додавання елемента в список
-        public void Add(T item)
+        public void RemoveAllCars()
         {
-            if (count == elements.Length)
-            {
-                Resize();
-            }
-            elements[count] = item;
-            count++;
-        }
-
-        // Метод для збільшення розміру масиву
-        private void Resize()
-        {
-            T[] newArray = new T[elements.Length * 2];
-            Array.Copy(elements, newArray, elements.Length);
-            elements = newArray;
+            cars.Clear();
         }
     }
+
 
 }
 
